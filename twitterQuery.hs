@@ -2,6 +2,9 @@
 
 module TwitterQuery (
       twitterSearch
+    , User(..)
+    , Status(..)
+    , Search(..)
 )where
 
 import Data.List as L
@@ -43,7 +46,7 @@ instance ToJSON Search
 
 twitterSearch :: String -> IO (Either String Search)
 twitterSearch term = do
-     req <- parseRequest $ "https://api.twitter.com/1.1/search/tweets.json?count=100&q=" ++ term
+     req <- parseRequest $ "https://api.twitter.com/1.1/search/tweets.json?count=100&q=a%20lang%3A" ++ term
      res <- withManager $ \m -> do
              signedreq <- signOAuth myoauth mycred req
              httpLbs signedreq m
