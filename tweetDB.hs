@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings,DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings,DeriveGeneric, UnicodeSyntax #-}
 
 module TweetDB (
       createTweetsDatabase
@@ -23,9 +23,9 @@ import TwitterQuery
 queryDatabase :: FilePath -> String -> IO [[SqlValue]]
 queryDatabase databaseFile sqlQuery = do
      conn <- connectSqlite3 databaseFile
-     let result = quickQuery' conn sqlQuery []
+     result <- quickQuery' conn sqlQuery []
      disconnect conn
-     result
+     return result
 
 createTweetsDatabase :: IO()
 createTweetsDatabase = do
@@ -56,8 +56,26 @@ insertTweetsInDatabase tweets = do
 
 collectTweetsIntoDatabase :: IO()
 collectTweetsIntoDatabase = do
-       status <- twitterSearch "en"
+       status <- twitterSearch "es"
        either
           putStrLn
           (\(Search statuses) -> insertTweetsInDatabase statuses) status
        threadDelay 5000
+
+
+readIntegerColumn :: [[SqlValue]] -> Integer-> [Integer]
+readIntegerColumn sqlResult index = L.map (\row -> fromSql $
+     genericIndex row index :: Integer) sqlResult
+
+readDoubleColumn :: [[SqlValue]] -> Integer -> [Double]
+readDoubleColumn sqlResult index = L.map (\row -> fromSql $
+     genericIndex row index :: Double) sqlResult
+
+readStringColumn :: [[SqlValue]] -> Integer -> [String]
+readStringColumn sqlResult index = L.map (\row -> fromSql $
+     genericIndex row index :: String) sqlResult
+
+frequency :: (Eq k, Data.Hashable.Hashable k, Integral v) =>
+                [k] -> HashMap k v
+frequency [] = HM.empty
+frequency (x:xs) = HM.insertWith (+) x 1 (frequency xs)

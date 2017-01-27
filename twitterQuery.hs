@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings,DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings,DeriveGeneric, UnicodeSyntax #-}
 
 module TwitterQuery (
       twitterSearch
